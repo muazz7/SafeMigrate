@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design system — BUILD-SPEC §6.
+   Light only. Dark mode is explicitly out of scope; a fixed palette keeps
+   contrast guarantees provable and the APK predictable on cheap panels.
+   ========================================================================== */
+
+@theme {
+  --color-bg: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-ink: #14201a;
+  --color-muted: #5c6b63;
+  --color-brand: #0f6b4f;
+  --color-brand-soft: #e6f2ed;
+  --color-border: #e4e2dc;
+
+  /* Severity. Never used as the ONLY signal — always colour + icon + word. */
+  --color-critical: #b4232a;
+  --color-high: #c2610c;
+  --color-medium: #8a6d18;
+  --color-info: #2c5a7a;
+  --color-safe: #0f6b4f;
+
+  --color-critical-soft: #fbeaea;
+  --color-high-soft: #fdf0e4;
+  --color-medium-soft: #f8f3e2;
+  --color-info-soft: #e8f0f6;
+  --color-safe-soft: #e6f2ed;
+
+  --font-bangla: "Noto Sans Bengali", var(--font-noto-bengali), sans-serif;
+  --font-latin: "Inter", var(--font-inter), sans-serif;
+
+  --radius-card: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Minimum body size is 17px (§6) — Bangla conjuncts are unreadable smaller. */
+  font-size: 17px;
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-bg);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-noto-bengali), var(--font-inter), sans-serif;
+  /* Bangla needs more leading than Latin. */
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  /* Never let the page scroll sideways at 360px. */
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+/* --------------------------------------------------------------------------
+   Native WebView chrome — §6 "Native chrome"
+   In a WebView, selectable text and long-press callouts make the app feel like
+   a website. Inputs keep both.
+   -------------------------------------------------------------------------- */
+
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Removes the 300ms grey flash on tap in the Android WebView. */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+input, textarea, select, [contenteditable], .selectable {
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* --------------------------------------------------------------------------
+   Safe areas — the app must clear the status bar and gesture navigation bar.
+   -------------------------------------------------------------------------- */
+
+.pad-top-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pad-bottom-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* --------------------------------------------------------------------------
+   Shared primitives
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  /* Tap targets are >=48x48px everywhere (§6, non-negotiable). */
+  .tap {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+  }
+
+  .btn-primary {
+    background: var(--color-brand);
+    color: #ffffff;
+    border-radius: var(--radius-card);
+    min-height: 56px;
+    font-weight: 600;
+    padding-inline: 1rem;
+  }
+
+  .btn-primary:active {
+    background: #0c5740;
+  }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-brand);
+    border: 1px solid var(--color-brand);
+    border-radius: var(--radius-card);
+    min-height: 56px;
+    font-weight: 600;
+    padding-inline: 1rem;
+  }
+
+  /* Visible keyboard focus. Removing this fails the accessibility bar. */
+  .focus-ring:focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Print — the complaint letter must come out clean on one A4 page (§10.7).
+   Web only; window.print() does nothing in a WebView.
+   -------------------------------------------------------------------------- */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  html, body {
+    background: #ffffff;
+    color: #000000;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  .print-sheet {
+    max-width: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

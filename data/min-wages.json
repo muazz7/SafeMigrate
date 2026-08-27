@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "_STUB": "REPLACE — placeholder rows for wiring only. Not verified wage floors.",
+    "source": "STUB — replace with destination-country minimum wage / bilateral MoU figures",
+    "source_url": null,
+    "collected_on": "2026-01-01",
+    "note": "R04 compares only within the SAME currency and never converts. A row is useless unless `currency` matches what appears on the contract."
+  },
+  "records": [
+    {
+      "country_code": "MY",
+      "country_en": "Malaysia",
+      "currency": "MYR",
+      "min_monthly_local": 1700
+    },
+    {
+      "country_code": "SA",
+      "country_en": "Saudi Arabia",
+      "currency": "SAR",
+      "min_monthly_local": 1000
+    },
+    {
+      "country_code": "AE",
+      "country_en": "United Arab Emirates",
+      "currency": "AED",
+      "min_monthly_local": 1000
+    }
+  ]
+}

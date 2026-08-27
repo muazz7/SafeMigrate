@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "_STUB": "REPLACE — placeholder rows for wiring only. Not real licence data.",
+    "source": "STUB — replace with BMET/MoEWOE recruiting agency licence list",
+    "source_url": null,
+    "collected_on": "2026-01-01",
+    "note": "Three rows covering the states the Agency Verifier must render: active, expired, suspended."
+  },
+  "records": [
+    {
+      "rl_number": "0000001",
+      "name": "STUB Active Recruiting Agency Ltd.",
+      "name_bn": null,
+      "status": "active",
+      "valid_until": "2027-12-31",
+      "district": "Dhaka",
+      "baira_member": true
+    },
+    {
+      "rl_number": "0000002",
+      "name": "STUB Expired Overseas Manpower",
+      "name_bn": null,
+      "status": "expired",
+      "valid_until": "2023-06-30",
+      "district": "Chattogram",
+      "baira_member": true
+    },
+    {
+      "rl_number": "0000003",
+      "name": "STUB Suspended International Services",
+      "name_bn": null,
+      "status": "suspended",
+      "valid_until": "2026-12-31",
+      "district": "Sylhet",
+      "baira_member": false
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">নিরাপদ প্রবাস</string>
+    <string name="title_activity_main">নিরাপদ প্রবাস</string>
+    <string name="package_name">org.safemigrate.app</string>
+    <string name="custom_url_scheme">org.safemigrate.app</string>
+</resources>

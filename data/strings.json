@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "_NOTE": "Bangla here was transcribed ONLY from BUILD-SPEC-v3.md. No Bangla has been invented or machine-translated (BUILD-SPEC §0 rule 3). Keys with an English value but no `bn` entry are awaiting the developer's copy and are logged to MISSING_STRINGS.md at runtime.",
+    "default_lang": "bn",
+    "fallback_lang": "en"
+  },
+  "bn": {
+    "app": {
+      "name": "নিরাপদ প্রবাস"
+    },
+    "nav": {
+      "scan": "স্ক্যান",
+      "agency": "এজেন্সি",
+      "cost": "খরচ",
+      "vault": "নথি"
+    },
+    "home": {
+      "trust": "কোনো নিবন্ধন লাগবে না। আপনার নথি গোপন থাকবে।"
+    },
+    "scan": {
+      "take_photo": "ছবি তুলুন",
+      "pick_file": "ফাইল বাছুন",
+      "fee_question": "এজেন্সি কত টাকা চেয়েছে?",
+      "prior_salary_question": "প্রথমে কত বেতনের কথা বলা হয়েছিল?",
+      "demo_row": "ডেমো নথি"
+    },
+    "verdict": {
+      "safe": "নিরাপদ",
+      "caution": "সতর্ক",
+      "high": "ঝুঁকিপূর্ণ",
+      "critical": "অত্যন্ত ঝুঁকিপূর্ণ"
+    },
+    "result": {
+      "evidence_label": "চুক্তিতে যা লেখা আছে",
+      "action_label": "কী করবেন",
+      "info_group_heading": "জানিয়ে রাখা হচ্ছে",
+      "overcharge_headline": "আপনার কাছে অতিরিক্ত চাওয়া হয়েছে",
+      "next_verify_agency": "এজেন্সি যাচাই করুন",
+      "next_make_complaint": "অভিযোগপত্র তৈরি করুন",
+      "next_save_document": "নথি সংরক্ষণ করুন"
+    },
+    "agency": {
+      "stop_before_paying": "টাকা দেওয়ার আগে থামুন",
+      "how_to_spot_heading": "কীভাবে চিনবেন"
+    },
+    "errors": {
+      "file_too_large": "ছবিটি অনেক বড়। আবার তুলুন।",
+      "network": "এখন সংযোগ পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।",
+      "no_tts_voice": "আপনার ফোনে বাংলা পড়ে শোনানোর সুবিধা নেই",
+      "offline_extraction": "ইন্টারনেট ছাড়া চুক্তি পড়া যাবে না"
+    }
+  },
+  "en": {
+    "app": {
+      "name": "SafeMigrate",
+      "tagline": "Check your work contract before you sign or pay."
+    },
+    "nav": {
+      "scan": "Scan",
+      "agency": "Agency",
+      "cost": "Cost",
+      "vault": "Documents"
+    },
+    "home": {
+      "trust": "No registration needed. Your documents stay private.",
+      "scan_title": "Contract Scanner",
+      "scan_desc": "Photograph your contract and hear what it says.",
+      "agency_title": "Agency Verifier",
+      "agency_desc": "Check whether a recruiting agency is licensed.",
+      "cost_title": "Cost Checker",
+      "cost_desc": "Compare what you were asked to pay with the legal limit.",
+      "vault_title": "Documents",
+      "vault_desc": "Keep proof of what you paid and signed."
+    },
+    "scan": {
+      "take_photo": "Take a photo",
+      "pick_file": "Choose a file",
+      "fee_question": "How much did the agency ask for?",
+      "prior_salary_question": "What salary were you told at first?",
+      "demo_row": "Demo documents"
+    },
+    "verdict": {
+      "safe": "Safe",
+      "caution": "Caution",
+      "high": "Risky",
+      "critical": "Very risky"
+    },
+    "result": {
+      "evidence_label": "What the contract says",
+      "action_label": "What to do",
+      "info_group_heading": "For your information",
+      "overcharge_headline": "You are being overcharged",
+      "next_verify_agency": "Verify the agency",
+      "next_make_complaint": "Create a complaint letter",
+      "next_save_document": "Save this document"
+    },
+    "agency": {
+      "stop_before_paying": "Stop before you pay",
+      "how_to_spot_heading": "How to recognise a fake agency"
+    },
+    "common": {
+      "language_toggle": "English",
+      "disclaimer": "This app flags possible risks for you to check with a person. It is not legal advice and does not decide whether a document is fraudulent."
+    },
+    "errors": {
+      "file_too_large": "The image is too large. Please take it again.",
+      "network": "No connection right now. Please try again shortly.",
+      "no_tts_voice": "Your phone cannot read Bangla aloud.",
+      "offline_extraction": "Contracts cannot be read without internet.",
+      "generic": "Something went wrong. Please try again.",
+      "unsupported_type": "That file type is not supported. Use JPG, PNG, WEBP, or PDF.",
+      "camera_denied": "Camera permission is needed to photograph your document."
+    }
+  }
+}

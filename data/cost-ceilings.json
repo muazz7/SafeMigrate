@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "_STUB": "REPLACE — placeholder rows for wiring only. Not verified government figures.",
+    "source": "STUB — replace with MoEWOE migration cost circular",
+    "source_url": null,
+    "collected_on": "2026-01-01",
+    "note": "Malaysia figures are the worked example from BUILD-SPEC §10.3/§10.5 (380,000 demanded -> 301,010 overcharge -> 4.8x). ceiling_bdt null means 'not known' and R02 SKIPS — never treat null or 0 as a zero ceiling."
+  },
+  "records": [
+    {
+      "country_code": "MY",
+      "country_en": "Malaysia",
+      "country_bn": "মালয়েশিয়া",
+      "ceiling_bdt": 78990,
+      "actual_avg_bdt": null
+    },
+    {
+      "country_code": "SA",
+      "country_en": "Saudi Arabia",
+      "country_bn": "সৌদি আরব",
+      "ceiling_bdt": null,
+      "actual_avg_bdt": null
+    },
+    {
+      "country_code": "AE",
+      "country_en": "United Arab Emirates",
+      "country_bn": "সংযুক্ত আরব আমিরাত",
+      "ceiling_bdt": null,
+      "actual_avg_bdt": null
+    }
+  ]
+}
