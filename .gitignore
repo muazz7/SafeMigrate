@@ -14,6 +14,11 @@
 
 # local tooling config
 .claude/
+MEMORY.md
+
+# internal working documents — kept local, not published
+CLAUDE.md
+BUILD-SPEC-v3.md
 
 # debug
 npm-debug.log*
