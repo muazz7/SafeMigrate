@@ -110,6 +110,53 @@ const openWebFilePicker = (accept: string, capture: boolean): Promise<PickedFile
 const IMAGE_TYPES = 'image/jpeg,image/png,image/webp';
 const DOC_TYPES = `${IMAGE_TYPES},application/pdf`;
 
+/** Longest edge requested from the native camera — matches lib/image.ts MAX_EDGE. */
+const NATIVE_MAX_EDGE = 1600;
+
+export type CameraPermission = 'granted' | 'denied' | 'prompt';
+
+/**
+ * Current camera permission, without triggering the system dialog.
+ * 'prompt' on web — the browser asks at capture time and there is nothing to check.
+ */
+async function getCameraPermission(): Promise<CameraPermission> {
+  if (!isNative()) return 'granted';
+
+  const { Camera } = await import('@capacitor/camera');
+  const status = await Camera.checkPermissions();
+  if (status.camera === 'granted' || status.camera === 'limited') return 'granted';
+  if (status.camera === 'denied') return 'denied';
+  return 'prompt';
+}
+
+/**
+ * Triggers the system permission dialog. The caller MUST have shown the Bangla
+ * explanation first (§10.2) — a system dialog with no context is how users deny
+ * a permission they actually need.
+ */
+async function requestCameraPermission(): Promise<CameraPermission> {
+  if (!isNative()) return 'granted';
+
+  const { Camera } = await import('@capacitor/camera');
+  const status = await Camera.requestPermissions({ permissions: ['camera'] });
+  if (status.camera === 'granted' || status.camera === 'limited') return 'granted';
+  if (status.camera === 'denied') return 'denied';
+  return 'prompt';
+}
+
+/** Opens this app's system settings page so a denied permission can be re-granted (§15). */
+async function openAppSettings(): Promise<void> {
+  if (!isNative()) return;
+  const { AppSettings } = await import('@/lib/app-settings-plugin');
+  await AppSettings.open();
+}
+
+const guessMimeFromFormat = (format: string): string => {
+  if (format === 'png') return 'image/png';
+  if (format === 'webp') return 'image/webp';
+  return 'image/jpeg';
+};
+
 async function capturePhoto(): Promise<PickedFile> {
   if (!isNative()) {
     // The HTML capture attribute is unreliable inside a WebView, which is exactly
@@ -117,15 +164,79 @@ async function capturePhoto(): Promise<PickedFile> {
     return openWebFilePicker(IMAGE_TYPES, true);
   }
 
-  // TODO(Day 2): @capacitor/camera + Bangla pre-prompt before the system dialog.
-  throw new PlatformError('errors.generic', 'native capturePhoto not implemented until Day 2');
+  const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+
+  try {
+    // The plugin resizes before returning, so the large original never crosses
+    // the JS bridge — noticeably faster on a low-end phone (§7.4.2).
+    const photo = await Camera.getPhoto({
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera,
+      quality: 80,
+      width: NATIVE_MAX_EDGE,
+      height: NATIVE_MAX_EDGE,
+      correctOrientation: true,
+      allowEditing: false,
+    });
+
+    if (!photo.base64String) throw new PlatformError('errors.generic', 'camera returned no data');
+
+    const mimeType = guessMimeFromFormat(photo.format);
+    return {
+      base64: photo.base64String,
+      mimeType,
+      fileName: `photo-${photo.format || 'jpg'}`,
+      previewUrl: `data:${mimeType};base64,${photo.base64String}`,
+    };
+  } catch (error) {
+    throw toPickerError(error);
+  }
 }
 
 async function pickFile(): Promise<PickedFile> {
   if (!isNative()) return openWebFilePicker(DOC_TYPES, false);
 
-  // TODO(Day 2): @capacitor/camera gallery source + @capacitor/filesystem for PDFs.
-  throw new PlatformError('errors.generic', 'native pickFile not implemented until Day 2');
+  const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+
+  try {
+    // Gallery source uses the Android 13+ photo picker, which needs no storage
+    // permission at all — see the manifest comment in §13.4.
+    const photo = await Camera.getPhoto({
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Photos,
+      quality: 80,
+      width: NATIVE_MAX_EDGE,
+      height: NATIVE_MAX_EDGE,
+      correctOrientation: true,
+      allowEditing: false,
+    });
+
+    if (!photo.base64String) throw new PlatformError('errors.generic', 'picker returned no data');
+
+    const mimeType = guessMimeFromFormat(photo.format);
+    return {
+      base64: photo.base64String,
+      mimeType,
+      fileName: `document-${photo.format || 'jpg'}`,
+      previewUrl: `data:${mimeType};base64,${photo.base64String}`,
+    };
+  } catch (error) {
+    throw toPickerError(error);
+  }
+}
+
+/** Maps the plugin's string errors onto our typed, translatable errors. */
+function toPickerError(error: unknown): PlatformError {
+  if (error instanceof PlatformError) return error;
+
+  const message = error instanceof Error ? error.message : String(error);
+  const lower = message.toLowerCase();
+
+  if (lower.includes('cancel')) return new PlatformError('errors.cancelled', message);
+  if (lower.includes('denied') || lower.includes('permission')) {
+    return new PlatformError('errors.camera_denied', message);
+  }
+  return new PlatformError('errors.generic', message);
 }
 
 // ---------------------------------------------------------------------------
@@ -318,19 +429,32 @@ async function initNativeChrome(): Promise<void> {
 
 /**
  * Hardware back button. Without this a judge pressing back once leaves the app (§9.1).
- * `handler` returns true if it consumed the press. Returns an unsubscribe function.
+ *
+ * `handler` receives Capacitor's `canGoBack` and returns true if it consumed the
+ * press. Do NOT substitute `window.history.length` for `canGoBack`: history.length
+ * counts forward entries too, so it stays above 1 after navigating back and the
+ * app silently exits at the root instead of confirming.
  */
-async function onHardwareBack(handler: () => boolean): Promise<() => void> {
+async function onHardwareBack(
+  handler: (context: { canGoBack: boolean }) => boolean,
+): Promise<() => void> {
   if (!isNative()) return () => {};
 
   const { App } = await import('@capacitor/app');
   const listener = await App.addListener('backButton', ({ canGoBack }) => {
-    if (handler()) return;
+    if (handler({ canGoBack })) return;
     if (canGoBack) window.history.back();
-    else App.exitApp();
+    else void App.exitApp();
   });
 
   return () => void listener.remove();
+}
+
+/** Closes the app. No-op on web, where a page cannot close itself. */
+async function exitApp(): Promise<void> {
+  if (!isNative()) return;
+  const { App } = await import('@capacitor/app');
+  await App.exitApp();
 }
 
 // ---------------------------------------------------------------------------
@@ -338,6 +462,9 @@ async function onHardwareBack(handler: () => boolean): Promise<() => void> {
 export const platform = {
   capturePhoto,
   pickFile,
+  getCameraPermission,
+  requestCameraPermission,
+  openAppSettings,
   speak,
   stopSpeaking,
   canSpeak,
@@ -348,4 +475,5 @@ export const platform = {
   removeItem,
   initNativeChrome,
   onHardwareBack,
+  exitApp,
 };

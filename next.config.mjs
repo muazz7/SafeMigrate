@@ -9,10 +9,22 @@
  */
 const isNative = process.env.BUILD_TARGET === 'native';
 
+/**
+ * API route handlers are named `route.api.ts` rather than `route.ts`, and the
+ * `api.ts` page extension is registered ONLY for the web build. The native build
+ * therefore never resolves them, so `output: 'export'` never tries to collect page
+ * data for a server-only route — which fails the build outright.
+ *
+ * This is what keeps §4.1 true in practice: one set of API routes, living only on
+ * Vercel, with the APK shipping a pure static frontend that calls them absolutely.
+ */
+const pageExtensions = isNative ? ['tsx', 'ts'] : ['tsx', 'ts', 'api.ts'];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...(isNative ? { output: 'export', images: { unoptimized: true } } : {}),
   trailingSlash: isNative,
+  pageExtensions,
   typescript: { ignoreBuildErrors: false },
 };
 

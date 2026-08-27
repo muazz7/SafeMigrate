@@ -59,3 +59,44 @@ query contracts at all. Session isolation is still enforced — in the server ro
 where it can't be spoofed by editing a request header. Same guarantee as the spec
 intends, strictly stronger boundary. **To be documented in README under "Known
 limitations" (§16.7) on Day 10.**
+
+---
+
+## Day 2
+
+### D8 — API route handlers are named `route.api.ts`, not `route.ts`
+**Spec:** §4 file map shows `api/extract/route.ts`.
+**Actual:** `api/extract/route.api.ts`, with `pageExtensions` in `next.config.mjs` set to
+`['tsx','ts','api.ts']` for web and `['tsx','ts']` for native.
+**Reason:** required to make §4.1 actually build. `output: 'export'` fails with
+"Failed to collect page data for /api/extract" as soon as a route handler is real
+(imports `node:crypto`, uses `force-dynamic`). Registering the `api.ts` extension only
+for the web target means the native build never resolves the route at all, so the export
+succeeds and the APK ships zero server code — which is exactly the outcome §4.1 wants.
+**Verified:** `/api/extract` present in the web build, absent from `out/`.
+
+> A trivial placeholder route DOES export without complaint, so this failure only
+> appears once the route does real work. Worth knowing before adding `/api/analyze`
+> and `/api/agency` — name them `route.api.ts` from the start.
+
+### D9 — `src/lib/back-stack.ts` added (not in the §4 file map)
+**Reason:** §9.1 requires back to close a modal before navigating. Components need a way
+to register an interceptor without importing Capacitor (§9.2 forbids that), so the
+registry lives here and AppShell owns the single platform listener.
+
+### D10 — Debug-only Android network security config
+**Added:** `android/app/src/debug/{AndroidManifest.xml,res/xml/network_security_config.xml}`.
+**Reason:** permits cleartext to `10.0.2.2` so the emulator can reach `next dev` during
+development. Lives in the `debug` source set, so it is **never merged into a release
+APK** — release keeps `usesCleartextTraffic="false"`. Not a production behaviour change.
+
+### D11 — `platform.exitApp()` added
+**Reason:** §9.1's "prompts before exiting" needs the confirm sheet's button to actually
+close the app. Same rationale as D3 — a platform branch belongs in `platform.ts`.
+
+### D12 — Minimal custom Capacitor plugin: `AppSettingsPlugin.java`
+**Spec:** §15 requires "a button opening app settings" when camera permission is denied.
+**Reason:** Capacitor 6 ships no first-party plugin for this, and Android only allows
+re-granting a permanently denied permission from the system settings page. ~25 lines of
+Java plus a `registerPlugin` call. The UI also shows written instructions and offers the
+file-picker path, so a failure here still leaves the user a way forward.

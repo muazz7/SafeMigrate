@@ -77,3 +77,17 @@ alter table complaints enable row level security;
 -- No permissive policies are defined for the anon role. All access goes through
 -- server routes using the service-role key, which bypasses RLS. This keeps the
 -- browser and the APK unable to query these tables directly at all.
+
+-- ---------------------------------------------------------------------------
+-- Storage — BUILD-SPEC §5.2
+-- One PRIVATE bucket. These are real employment contracts; a public bucket would
+-- expose them to anyone who guessed a path. Server routes issue 60-minute signed
+-- URLs when a document needs to be displayed.
+-- ---------------------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('documents', 'documents', false)
+on conflict (id) do update set public = false;
+
+-- No storage policies for anon either: uploads and reads go through the service
+-- role in the API routes.

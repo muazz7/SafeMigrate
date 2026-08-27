@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { platform } from '@/lib/platform';
+import { consumeBackPress } from '@/lib/back-stack';
 import { t } from '@/lib/strings';
 
 /**
@@ -82,18 +83,39 @@ const NAV: NavItem[] = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [confirmingExit, setConfirmingExit] = useState(false);
+  // Read inside the back listener, which is registered once and would otherwise
+  // close over the initial state value.
+  const confirmingExitRef = useRef(false);
+  useEffect(() => {
+    confirmingExitRef.current = confirmingExit;
+  }, [confirmingExit]);
 
   // Native chrome once per app launch. No-ops entirely on the web.
   useEffect(() => {
     void platform.initNativeChrome();
   }, []);
 
-  // Hardware back. Returning false lets the default history/exit behaviour run.
+  /**
+   * Hardware back — §9.1: close a modal, else navigate back, else confirm exit.
+   * Returning true consumes the press; false falls through to the platform's
+   * own history/exit handling.
+   */
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
-    void platform.onHardwareBack(() => false).then((fn) => {
-      unsubscribe = fn;
-    });
+
+    void platform
+      .onHardwareBack(({ canGoBack }) => {
+        if (consumeBackPress()) return true; // An overlay was open — close it.
+        if (canGoBack) return false; // Fall through to normal history navigation.
+        if (confirmingExitRef.current) return false; // Second press at root: exit.
+        setConfirmingExit(true); // At the root — confirm before leaving.
+        return true;
+      })
+      .then((fn) => {
+        unsubscribe = fn;
+      });
+
     return () => unsubscribe?.();
   }, []);
 
@@ -135,6 +157,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </ul>
       </nav>
+
+      {confirmingExit ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-30 bg-black/40 flex items-end justify-center"
+          onClick={() => setConfirmingExit(false)}
+        >
+          <div
+            className="bg-surface w-full max-w-[480px] rounded-t-[12px] p-4 pad-bottom-safe flex flex-col gap-3"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="font-semibold">{t('common.exit_confirm')}</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                className="btn-secondary focus-ring flex-1"
+                onClick={() => setConfirmingExit(false)}
+              >
+                {t('common.stay')}
+              </button>
+              <button
+                type="button"
+                className="btn-primary focus-ring flex-1"
+                onClick={() => void platform.exitApp()}
+              >
+                {t('common.exit')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
