@@ -94,6 +94,67 @@ APK** — release keeps `usesCleartextTraffic="false"`. Not a production behavio
 **Reason:** §9.1's "prompts before exiting" needs the confirm sheet's button to actually
 close the app. Same rationale as D3 — a platform branch belongs in `platform.ts`.
 
+### D12b — ⚠️ `scan.camera_why_body` claims nothing is stored, but documents ARE stored
+**Supplied by the developer (§0 rule 9, so it is in place):**
+> "চুক্তির ছবি তুলতে এবং যাচাই করতে ক্যামেরা ব্যবহারের অনুমতি দিন। আপনার কোনো তথ্য বা ছবি
+> সংরক্ষণ করা হবে না।" — "…None of your information or photos will be stored."
+
+**The conflict:** `/api/extract` uploads the image to the Supabase `documents` bucket and
+inserts a `documents` row. The Vault (§10.6) exists precisely so the worker keeps a
+timestamped copy of what they signed. So the sentence is not accurate as the system is
+built.
+
+**Why it matters more than a wording nit:** §16 privacy is directly scored, and §16.8
+requires the app never overclaim. A false privacy promise on a migrant-safety tool is the
+kind of thing a domain judge tests by asking "so where does my photo go?". It is also the
+one claim a user might rely on when deciding to photograph a sensitive document.
+
+**Options, developer's call:**
+1. Reword to what is true — e.g. the photo is stored privately, only the worker's session
+   can reach it, and it can be deleted from the Vault at any time.
+2. Keep the sentence and make it true by not persisting (this removes the Vault).
+
+**Currently in place as supplied. Needs a decision before the fair.**
+
+### D13 — `analyze()` input carries `confidence` and `today`
+**Spec:** §8.1 lists six input fields, none of them confidence or a date.
+**Reason:** §8.4 requires I01 to fire on `confidence < 0.6`, and R03 to fire when
+`valid_until` has passed — neither is computable from the six listed fields. `today` is
+injected rather than read from the clock so the engine stays pure and its tests stay
+deterministic, which §8 treats as the whole point of the file.
+
+### D14 — Rules expose an `evaluable` predicate alongside `Finding | null`
+**Spec:** §8.4 "returning null when it cannot be evaluated or does not fire".
+**Reason:** that signature conflates "checked, and fine" with "could not check", but §8.1
+requires a `skippedCount` and §10.3 renders it to the user. Each rule keeps the exact
+`(input) => Finding | null` signature the spec names; a parallel `evaluable` predicate in
+the `RULES` registry supplies the count. Without it, a document missing half its fields
+would report as thoroughly checked.
+
+### D15 — Readability guard before any rule runs
+**Added:** `isDocumentReadable()` — if no substantive field was extracted, every rule
+reports "not evaluated" instead of running.
+**Reason:** R07/R09/R13 fire on nulls by design (silence about a return ticket IS the
+warning). On a blurred photo where every field is null, that same logic would manufacture
+warnings from an unread page — wrong, and it would discredit every genuine flag beside
+it. §8.5 requires "empty contract → 0 findings", which is unreachable otherwise.
+**Not a softening (§16.9):** no severity or condition is weakened; skipped checks are
+counted and surfaced, and I01/I03 tell the user to re-photograph.
+
+### D16 — R03 skips when the document names no agency
+**Reason:** §8.4 says R03 fires when `agencyMatch === null`, which taken literally emits a
+critical "agency not licensed" for a contract that never mentions an agency. There is
+nothing to verify in that case, so the rule reports "not evaluated". A named agency that
+is absent from the list still fires critical, unchanged.
+
+### D17 — `quoted_clauses` keyed by topic, not by rule id
+**Spec:** §7.2 describes `quoted_clauses` as mapping a rule id to its source sentence.
+**Actual:** the prompt asks for plain topic keys ("passport", "salary"); `rules.ts` maps
+each rule to its topics when attaching evidence, and still accepts a rule id if present.
+**Reason:** telling the model our rule ids would teach it the rule set, which is exactly
+the coupling §8 exists to prevent — the claim that the model cannot invent a violation
+holds only while it has never been shown one. Evidence still reaches every finding.
+
 ### D12 — Minimal custom Capacitor plugin: `AppSettingsPlugin.java`
 **Spec:** §15 requires "a button opening app settings" when camera permission is denied.
 **Reason:** Capacitor 6 ships no first-party plugin for this, and Android only allows

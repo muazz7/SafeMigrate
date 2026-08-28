@@ -62,8 +62,12 @@ and nowhere else.
 These have no entry in either language yet. Listed so the developer can prepare copy
 ahead of the day that needs it.
 
-- **Day 5 — the rules engine copy. The largest and most important block.**
-  For each of `R01`–`R14` and `I01`–`I03`: `rules.<id>.title`, `.explain`, `.action`.
+- **Day 5 — the rules engine copy. THE BLOCKER for the results screen.**
+  The engine is built and emits these keys today; every finding currently renders its
+  raw key. For each of `R01`–`R14` and `I01`–`I03`: `rules.<id>.title`,
+  `rules.<id>.explain`, `rules.<id>.action` — **51 strings**.
+  Each rule's JSDoc in `src/lib/rules.ts` states what it checks and why it matters; that
+  is the source material for the Bangla copy.
   - `R01` needs the deliberately gentler tone described in §8.4: acknowledge that the
     practice is common and that employers have a stated reason, then give the
     destination-country legal position, then one concrete action (get a written

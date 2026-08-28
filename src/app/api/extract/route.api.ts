@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { errorWithCors, jsonWithCors, preflight } from '@/lib/cors';
 import { DOCUMENTS_BUCKET, getServerSupabase, isSupabaseConfigured } from '@/lib/supabase';
 import { emptyContract, type ExtractedContract } from '@/lib/schema';
+import { ExtractionError, getProvider } from '@/lib/extract';
 import { DOC_TYPES, type DocType, type ExtractResponse } from '@/types';
 
 /**
@@ -120,14 +121,79 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  // --- extract (Day 3 replaces this) -----------------------------------------
+  // --- extract ---------------------------------------------------------------
+  // Falls back to the fixture when no provider is configured, so the whole
+  // pipeline stays exercisable before the API key and samples/ arrive.
+  let parsed: ExtractedContract;
+  let confidence: number;
+  let providerName = 'stub';
+  let raw: unknown = null;
+
+  if (process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY) {
+    try {
+      const provider = await getProvider();
+      providerName = provider.name;
+
+      const base64 = Buffer.from(await file.arrayBuffer()).toString('base64');
+      const result = await provider.extract({
+        fileBase64: base64,
+        mimeType: file.type,
+        docType,
+      });
+
+      parsed = result.parsed;
+      confidence = result.confidence;
+      raw = result.raw;
+    } catch (error) {
+      const code = error instanceof ExtractionError ? error.code : 'EXTRACTION_FAILED';
+      console.error(`[extract] provider failed (${code})`);
+
+      // Two attempts have already been made inside the provider (§7.1). Return a
+      // partial extraction with confidence 0; the UI shows the retake-photo state.
+      if (code === 'TIMEOUT' || code === 'NETWORK') {
+        return errorWithCors(request, code, 'errors.network', 504);
+      }
+      parsed = emptyContract();
+      confidence = 0;
+    }
+  } else {
+    parsed = stubExtraction(docType);
+    confidence = 0.82;
+  }
+
+  // --- persist the extraction ------------------------------------------------
+  const extractionId = randomUUID();
+
+  if (supabase && persisted) {
+    try {
+      await supabase.from('extractions').insert({
+        id: extractionId,
+        document_id: documentId,
+        provider: providerName,
+        raw_response: raw ?? {},
+        parsed,
+        confidence,
+        language_detected: parsed.document_language,
+      });
+    } catch (error) {
+      console.error('[extract] could not persist extraction:', error);
+    }
+  }
+
   const response: ExtractResponse & { persisted: boolean } = {
     documentId,
-    extractionId: randomUUID(),
-    parsed: stubExtraction(docType),
-    confidence: 0.82,
+    extractionId,
+    parsed,
+    confidence,
     persisted,
   };
+
+  // Field names and counts only, never values (§16.2).
+  console.info(
+    `[extract] provider=${providerName} confidence=${confidence} fields=${
+      Object.values(parsed).filter((v) => v !== null).length
+    }`,
+  );
 
   return jsonWithCors(request, response);
 }
