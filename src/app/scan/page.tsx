@@ -6,10 +6,20 @@ import { UploadDropzone } from '@/components/UploadDropzone';
 import { ProgressSteps, type UploadStep } from '@/components/ProgressSteps';
 import { apiFetch, ApiRequestError } from '@/lib/api';
 import { toBlob, base64Bytes, MAX_UPLOAD_BYTES } from '@/lib/image';
-import { getSessionId } from '@/lib/storage';
+import { getSessionId, saveAnalysis } from '@/lib/storage';
+import { analyze } from '@/lib/rules';
+import { bestMatch } from '@/lib/agencies';
+import { ceilingForCountry, minWageForCountry } from '@/lib/cost';
 import type { PickedFile } from '@/lib/platform';
 import { t } from '@/lib/strings';
 import { DOC_TYPES, type DocType, type ExtractResponse } from '@/types';
+
+const todayIso = (): string => new Date().toISOString().slice(0, 10);
+
+const parseAmount = (raw: string): number | null => {
+  const value = Number(raw.trim());
+  return Number.isFinite(value) && value > 0 ? value : null;
+};
 
 /** Scan — BUILD-SPEC §10.2. */
 
@@ -51,16 +61,46 @@ export default function ScanPage() {
           body: form,
         });
 
-        // Day 4 wires /api/analyze here; for now the read step completes and we
-        // hand the extraction id to the results screen.
         setPhase({ kind: 'working', file, step: 'checking' });
 
-        const params = new URLSearchParams({ id: result.extractionId });
-        if (feeBdt.trim()) params.set('fee', feeBdt.trim());
-        if (priorSalary.trim()) params.set('prior', priorSalary.trim());
+        // The rules engine is pure and platform-neutral, so it runs right here on
+        // the device. No second round trip, and the result stays readable offline.
+        const contract = result.parsed;
+        const declaredFee = parseAmount(feeBdt);
+        const prior = parseAmount(priorSalary);
+
+        const analysis = analyze({
+          contract,
+          agencyMatch: bestMatch(contract.agency_rl_number ?? contract.agency_name),
+          costCeiling: ceilingForCountry(contract.workplace_country_code),
+          minWage: minWageForCountry(contract.workplace_country_code),
+          userDeclaredFeeBdt: declaredFee,
+          // The form asks for a figure only, so it is read in the contract's own
+          // currency. With no currency known, R06 skips rather than guessing.
+          priorOfferSalary:
+            prior !== null && contract.salary_currency
+              ? { amount: prior, currency: contract.salary_currency }
+              : null,
+          confidence: result.confidence,
+          today: todayIso(),
+        });
+
+        const analysisId = result.extractionId;
+        await saveAnalysis({
+          id: analysisId,
+          createdAt: new Date().toISOString(),
+          documentId: result.documentId,
+          extractionId: result.extractionId,
+          docType,
+          confidence: result.confidence,
+          contract,
+          result: analysis,
+          agencyQuery: contract.agency_name ?? contract.agency_rl_number,
+          feeBdt: declaredFee ?? contract.total_fee_demanded_bdt,
+        });
 
         setPhase({ kind: 'working', file, step: 'done' });
-        router.push(`/scan/result?${params.toString()}`);
+        router.push(`/scan/result?id=${encodeURIComponent(analysisId)}`);
       } catch (error) {
         const messageKey =
           error instanceof ApiRequestError ? error.userMessageKey : 'errors.generic';

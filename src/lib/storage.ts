@@ -1,4 +1,6 @@
 import { platform } from '@/lib/platform';
+import type { ExtractedContract } from '@/lib/schema';
+import type { AnalysisResult, DocType } from '@/types';
 
 /**
  * Session persistence — BUILD-SPEC §14 Day 2.5.
@@ -51,4 +53,73 @@ export async function getSessionId(): Promise<string> {
 export async function clearSession(): Promise<void> {
   cached = null;
   await platform.removeItem(SESSION_KEY);
+}
+
+// ---------------------------------------------------------------------------
+// Analysis results
+// ---------------------------------------------------------------------------
+
+/**
+ * A completed analysis, held on the device so the results screen can be reopened,
+ * shared as a link within the app, and survive a refresh.
+ *
+ * The rules engine is pure and runs identically in the WebView, so the analysis is
+ * computed on the client and stored here rather than fetched back from the server.
+ * That is what lets a result stay readable with the radio off — which matters both
+ * for the aeroplane-mode demo (§12) and for a user out of data credit.
+ *
+ * The document image is deliberately NOT stored here: it is large, and the uploaded
+ * copy already lives in the private Storage bucket.
+ */
+export interface StoredAnalysis {
+  id: string;
+  createdAt: string;
+  documentId: string;
+  extractionId: string;
+  docType: DocType;
+  confidence: number;
+  contract: ExtractedContract;
+  result: AnalysisResult;
+  /** Prefills the Agency Verifier deep link from the results screen. */
+  agencyQuery: string | null;
+  feeBdt: number | null;
+}
+
+const analysisKey = (id: string): string => `safemigrate.analysis.${id}`;
+const INDEX_KEY = 'safemigrate.analysis.index';
+
+/** Newest first. Backs the Vault list on Day 8. */
+export async function analysisIndex(): Promise<string[]> {
+  const raw = await platform.getItem(INDEX_KEY);
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function saveAnalysis(analysis: StoredAnalysis): Promise<void> {
+  await platform.setItem(analysisKey(analysis.id), JSON.stringify(analysis));
+
+  const index = await analysisIndex();
+  const next = [analysis.id, ...index.filter((id) => id !== analysis.id)];
+  await platform.setItem(INDEX_KEY, JSON.stringify(next));
+}
+
+export async function loadAnalysis(id: string): Promise<StoredAnalysis | null> {
+  const raw = await platform.getItem(analysisKey(id));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as StoredAnalysis;
+  } catch {
+    return null; // Corrupt entry — the UI shows the "no longer available" state.
+  }
+}
+
+export async function deleteAnalysis(id: string): Promise<void> {
+  await platform.removeItem(analysisKey(id));
+  const index = await analysisIndex();
+  await platform.setItem(INDEX_KEY, JSON.stringify(index.filter((entry) => entry !== id)));
 }

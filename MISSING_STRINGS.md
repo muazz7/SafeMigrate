@@ -42,7 +42,7 @@ and nowhere else.
 | `scan.retake` | Take again |
 | `scan.confirm` | Continue |
 | `scan.camera_why_title` | Why the camera is needed |
-| `scan.camera_why_body` | The app needs the camera only to photograph your document. Nothing is taken from your phone and no photo is shared with anyone. |
+| ~~`scan.camera_why_body`~~ | ✅ **Bangla supplied by the developer on Day 5.** Wording revised so it no longer promises that nothing is stored — the document IS stored, and the Vault depends on that. See DEVIATIONS D12b. |
 | `scan.camera_denied_help` | Camera permission is turned off. Turn it on in Settings → Apps → SafeMigrate → Permissions, or choose an existing file instead. |
 | `scan.progress.uploading` | Sending your document |
 | `scan.progress.reading` | Reading the document |
@@ -78,3 +78,49 @@ ahead of the day that needs it.
 - **Day 6** — the four agency states, and the "কীভাবে চিনবেন" checklist items.
 - **Day 7** — cost checker labels, the 12 country names in Bangla.
 - **Day 8** — the complaint letter template, 64 district names, form field labels.
+
+---
+
+## Added Day 5 — results screen
+
+Every key below renders its **English fallback** today. The results UI is complete and
+testable; it is the Bangla that is outstanding.
+
+### The rules copy — 51 strings, the largest remaining block
+
+`rules.<id>.title`, `rules.<id>.explain`, `rules.<id>.action` for **R01–R14** and
+**I01–I03**. English is written for all 51 and is a faithful basis for translation —
+each rule's JSDoc in `src/lib/rules.ts` explains what it checks and why.
+
+Two need particular care:
+
+- **`rules.R01.*`** — passport confiscation. The tone is deliberately gentler than every
+  other rule: acknowledge that the practice is common and that employers give a reason,
+  then state the destination-country legal position, then one concrete action. The
+  severity stays **critical** regardless of how gentle the wording is.
+- **`rules.I02.*`** — documented safekeeping. Must read as a calm note, never a warning.
+  It is styled neutrally (blue, circled-i, grouped under `জানিয়ে রাখা হচ্ছে`) and the
+  Bangla must match that register.
+
+### Results screen chrome
+
+| Key | English fallback in use |
+|---|---|
+| `severity.critical` / `.high` / `.medium` / `.info` | Very serious / Serious / Worth checking / For information |
+| `result.verdict_count` | {{count}} things found |
+| `result.verdict_none` | Nothing of concern was found |
+| `result.speak_all` / `result.speak_this` | Listen to all of this / Listen |
+| `result.stop_speaking` | Stop |
+| `result.what_was_checked` | What was checked |
+| `result.next_actions` | What you can do next |
+| `result.ceiling_label` / `.demanded_label` / `.average_label` | Government limit / Asked of you / National average paid |
+| `result.no_evidence` | This check is based on what the contract does not say… |
+| `result.low_confidence_title` / `.low_confidence_body` | The document was hard to read / … |
+| `result.failed_title` / `.failed_body` | This document could not be read / … |
+| `result.not_found_title` / `.not_found_body` | This result is no longer available / … |
+| `result.retake` / `result.back_to_scan` | Take the photo again / Scan a document |
+| `computed.*` (18 keys) | Labels for the numbers shown on each card |
+
+**Already in Bangla** (transcribed from the spec, with values interpolated):
+`result.checked_summary` — "{{checked}}টি বিষয় পরীক্ষা করা হয়েছে, {{skipped}}টি তথ্যের
+অভাবে পরীক্ষা করা যায়নি" · `result.multiple_of_ceiling` — "সরকারি সীমার {{multiple}} গুণ"

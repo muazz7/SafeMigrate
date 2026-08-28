@@ -23,7 +23,7 @@
       "fee_question": "এজেন্সি কত টাকা চেয়েছে?",
       "prior_salary_question": "প্রথমে কত বেতনের কথা বলা হয়েছিল?",
       "demo_row": "ডেমো নথি",
-      "camera_why_body": "চুক্তির ছবি তুলতে এবং যাচাই করতে ক্যামেরা ব্যবহারের অনুমতি দিন। আপনার কোনো তথ্য বা ছবি সংরক্ষণ করা হবে না।"
+      "camera_why_body": "চুক্তির ছবি বিশ্লেষণ করতে ক্যামেরা ব্যবহারের অনুমতি দিন। আপনার নথি সম্পূর্ণ গোপন থাকবে এবং ভল্ট থেকে যেকোনো সময় মুছে ফেলতে পারবেন।"
     },
     "verdict": {
       "safe": "নিরাপদ",
@@ -38,7 +38,9 @@
       "overcharge_headline": "আপনার কাছে অতিরিক্ত চাওয়া হয়েছে",
       "next_verify_agency": "এজেন্সি যাচাই করুন",
       "next_make_complaint": "অভিযোগপত্র তৈরি করুন",
-      "next_save_document": "নথি সংরক্ষণ করুন"
+      "next_save_document": "নথি সংরক্ষণ করুন",
+      "checked_summary": "{{checked}}টি বিষয় পরীক্ষা করা হয়েছে, {{skipped}}টি তথ্যের অভাবে পরীক্ষা করা যায়নি",
+      "multiple_of_ceiling": "সরকারি সীমার {{multiple}} গুণ"
     },
     "agency": {
       "stop_before_paying": "টাকা দেওয়ার আগে থামুন",
@@ -115,11 +117,145 @@
       "overcharge_headline": "You are being overcharged",
       "next_verify_agency": "Verify the agency",
       "next_make_complaint": "Create a complaint letter",
-      "next_save_document": "Save this document"
+      "next_save_document": "Save this document",
+      "checked_summary": "{{checked}} things were checked, {{skipped}} could not be checked for lack of information",
+      "multiple_of_ceiling": "{{multiple}} times the government limit",
+      "verdict_count": "{{count}} things found",
+      "verdict_none": "Nothing of concern was found",
+      "speak_all": "Listen to all of this",
+      "stop_speaking": "Stop",
+      "what_was_checked": "What was checked",
+      "next_actions": "What you can do next",
+      "ceiling_label": "Government limit",
+      "demanded_label": "Asked of you",
+      "average_label": "National average paid",
+      "low_confidence_title": "The document was hard to read",
+      "low_confidence_body": "Some of the text could not be made out, so parts of this contract were not checked. A clearer photo will give a fuller answer.",
+      "failed_title": "This document could not be read",
+      "failed_body": "Nothing could be made out from this photo, so no check has been done. Please take it again.",
+      "retake": "Take the photo again",
+      "not_found_title": "This result is no longer available",
+      "not_found_body": "The result may have been cleared from this phone. Please scan the document again.",
+      "back_to_scan": "Scan a document",
+      "no_evidence": "This check is based on what the contract does not say, so there is no sentence to quote.",
+      "speak_this": "Listen"
+    },
+    "computed": {
+      "atWorkerRequest": "At your request",
+      "feeBdt": "Asked of you",
+      "ceilingBdt": "Government limit",
+      "overchargeBdt": "Extra",
+      "multiple": "Times the limit",
+      "state": "Licence",
+      "monthlySalary": "Monthly salary",
+      "floor": "Legal minimum",
+      "currency": "Currency",
+      "shortfall": "Short by",
+      "promised": "First promised",
+      "offered": "Now offered",
+      "weeklyHours": "Hours per week",
+      "probationMonths": "Probation months",
+      "workingDays": "Days per week",
+      "language": "Language",
+      "confidence": "Readability",
+      "skippedCount": "Checks not done"
     },
     "agency": {
       "stop_before_paying": "Stop before you pay",
       "how_to_spot_heading": "How to recognise a fake agency"
+    },
+    "severity": {
+      "critical": "Very serious",
+      "high": "Serious",
+      "medium": "Worth checking",
+      "info": "For information"
+    },
+    "rules": {
+      "R01": {
+        "title": "Your passport would be held, with no written promise to return it",
+        "explain": "The contract says the employer will keep your passport, and it does not promise in writing to give it back when you ask. Many employers do this and describe it as safekeeping. Even so, holding a worker's passport is against the law in Saudi Arabia, Qatar and the UAE, and without that written line you may not be able to get it back at the moment you need it.",
+        "action": "Ask for one sentence to be added before you sign: that your passport is returned to you whenever you ask for it. Photograph every page of your passport and keep the photos somewhere safe."
+      },
+      "R02": {
+        "title": "You are being asked for more than the legal limit",
+        "explain": "The government sets a maximum amount a recruiting agency may charge for this country. The amount asked of you is above that limit.",
+        "action": "Ask the agency in writing why the amount is higher, and get a signed receipt for every taka you pay. An overcharge can be reported to your District Employment and Manpower Office."
+      },
+      "R03": {
+        "title": "This agency's licence could not be confirmed as active",
+        "explain": "The agency named on this document does not appear with a valid, active recruiting licence in our copy of the government list. An agency without a live licence sits outside the system that is meant to protect you if something goes wrong.",
+        "action": "Do not pay anything until you have checked the licence yourself at your District Employment and Manpower Office or a BMET office. Ask to see the licence certificate in person."
+      },
+      "R04": {
+        "title": "The salary is below the minimum for that country",
+        "explain": "The monthly pay written in this document is less than the lowest legal wage for this work in the destination country.",
+        "action": "Ask the agency to show you where this salary is agreed. Do not travel on a contract that pays below the legal minimum."
+      },
+      "R05": {
+        "title": "Your recruitment cost would be taken out of your wages",
+        "explain": "The contract says the money spent recruiting you will be recovered from your salary. This is what turns a job into a debt, and it is the usual reason a worker cannot leave a bad workplace. Under international standards the employer pays recruitment costs, not the worker.",
+        "action": "Ask for this clause to be removed before you sign. Keep this document either way — it is evidence."
+      },
+      "R06": {
+        "title": "The salary is lower than what you were first told",
+        "explain": "The pay in this document is less than the amount you said you were promised earlier. Changing the terms after you have paid and committed is a recognised warning sign.",
+        "action": "Do not sign until the salary matches what you were promised. Keep any earlier offer, message or advertisement that shows the first amount."
+      },
+      "R07": {
+        "title": "The employer or the job is not clearly named",
+        "explain": "The document does not clearly say who you would work for, or exactly what work you would do. Without a named employer you cannot check who they are, and no one can be held responsible if you are mistreated.",
+        "action": "Ask for the employer's full name and address, and the exact job title, to be written into the contract before you sign."
+      },
+      "R08": {
+        "title": "You may not be free to leave the job or the country",
+        "explain": "The document says you cannot end the contract yourself, or that you need permission to leave the country. Being able to walk away is what separates a job from forced labour.",
+        "action": "Ask for the right to resign with notice to be written in. Save the phone number of the Bangladesh embassy in that country before you travel."
+      },
+      "R09": {
+        "title": "No return ticket home is promised",
+        "explain": "The contract does not say the employer will pay for your journey home. If you need to leave, the fare may be more than you can save, and you would be dependent on the employer's goodwill to get back.",
+        "action": "Ask for the return ticket to be written into the contract, including who pays for it if the job ends early."
+      },
+      "R10": {
+        "title": "Very long hours, with no overtime rate agreed",
+        "explain": "The hours written here add up to more than 48 in a week, which is the international standard limit, and no overtime rate is written down. Extra hours with no agreed rate are commonly left unpaid.",
+        "action": "Ask for the overtime rate to be written into the contract as an actual figure, not a promise."
+      },
+      "R11": {
+        "title": "The probation period cuts your pay or runs long",
+        "explain": "Your pay would be reduced during probation, or probation lasts longer than three months. This usually falls in the months when you owe the most and can least afford a smaller wage.",
+        "action": "Ask exactly what you would be paid during probation, and get that figure written into the contract."
+      },
+      "R12": {
+        "title": "No weekly rest day",
+        "explain": "The document shows no rest day in the week. One day of rest in seven is the international standard.",
+        "action": "Ask for a weekly rest day to be written into the contract."
+      },
+      "R13": {
+        "title": "Accommodation or food is not clearly provided",
+        "explain": "The contract does not clearly state that the employer provides both a place to live and food. These are often promised in conversation and left out of the paper, and their cost then comes out of your wage.",
+        "action": "Ask for accommodation and food to be written into the contract, and ask whether anything will be deducted from your pay for them."
+      },
+      "R14": {
+        "title": "The document is not in Bangla or English",
+        "explain": "This document is written in a language you may not be able to read. In a dispute it is usually the written version that counts, not what was explained to you aloud.",
+        "action": "Do not sign until you have a Bangla or English copy, and have someone you trust read it through with you."
+      },
+      "I01": {
+        "title": "Parts of the document could not be read",
+        "explain": "The photo was not clear enough to read every part of the document, so some checks could not be carried out.",
+        "action": "Take the photo again in better light, with the page flat and the whole page inside the frame."
+      },
+      "I02": {
+        "title": "The contract says your passport is returned on request",
+        "explain": "The employer would hold your passport, and the contract states in writing that it is returned to you whenever you ask for it. That written line is what keeps the passport under your control.",
+        "action": "Check that this line really is printed in the contract and not just promised aloud. Keep a photo of every page of your passport."
+      },
+      "I03": {
+        "title": "Several things could not be checked",
+        "explain": "A number of checks could not be carried out, because the document did not contain the information they need or that part could not be read.",
+        "action": "A clearer photo of the whole document — including the back and any extra pages — will let more checks run."
+      }
     },
     "common": {
       "language_toggle": "English",

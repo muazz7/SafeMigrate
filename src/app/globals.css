@@ -55,8 +55,21 @@ body {
   /* Bangla needs more leading than Latin. */
   line-height: 1.85;
   -webkit-font-smoothing: antialiased;
-  /* Never let the page scroll sideways at 360px. */
-  overflow-x: hidden;
+  /*
+   * `clip`, not `hidden`: `overflow-x: hidden` makes the element a scroll
+   * container, which silently breaks `position: sticky` on the header and bottom
+   * nav inside it. `clip` prevents sideways scrolling without that side effect.
+   */
+  overflow-x: clip;
+}
+
+/*
+ * Long unbroken tokens — an RL number, a URL, an employer name copied verbatim
+ * from a contract — must not be able to push the layout wider than the screen.
+ * At 360px there is no room to absorb it, and everything shifts together.
+ */
+h1, h2, h3, h4, p, li, dd, dt, blockquote, span {
+  overflow-wrap: anywhere;
 }
 
 h1, h2, h3, h4 {

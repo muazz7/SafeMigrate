@@ -122,7 +122,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <div className="min-h-dvh flex flex-col bg-bg">
+    <div className="min-h-dvh w-full flex flex-col bg-bg">
       <header className="pad-top-safe bg-brand text-white sticky top-0 z-20">
         <div className="mx-auto w-full max-w-[480px] px-4 h-14 flex items-center justify-between">
           <Link href="/" className="focus-ring rounded font-semibold text-[19px] leading-none py-2">
@@ -131,7 +131,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-[480px] px-4 py-5">{children}</main>
+      {/* min-w-0: a flex child defaults to min-width:auto, so wide content inside
+          would otherwise refuse to shrink and drag the whole column past 360px. */}
+      <main className="flex-1 min-w-0 mx-auto w-full max-w-[480px] px-4 py-5">{children}</main>
 
       <nav
         aria-label={t('nav.scan')}

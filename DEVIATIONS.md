@@ -114,7 +114,9 @@ one claim a user might rely on when deciding to photograph a sensitive document.
    can reach it, and it can be deleted from the Vault at any time.
 2. Keep the sentence and make it true by not persisting (this removes the Vault).
 
-**Currently in place as supplied. Needs a decision before the fair.**
+**RESOLVED (Day 5).** The developer chose option 1 and supplied revised Bangla: the
+document stays private and can be deleted from the Vault at any time. No promise that
+nothing is stored, so the copy now matches what the system does.
 
 ### D13 — `analyze()` input carries `confidence` and `today`
 **Spec:** §8.1 lists six input fields, none of them confidence or a date.
