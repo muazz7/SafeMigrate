@@ -138,7 +138,8 @@
       "not_found_body": "The result may have been cleared from this phone. Please scan the document again.",
       "back_to_scan": "Scan a document",
       "no_evidence": "This check is based on what the contract does not say, so there is no sentence to quote.",
-      "speak_this": "Listen"
+      "speak_this": "Listen",
+      "see_cost_breakdown": "See the full cost comparison"
     },
     "computed": {
       "atWorkerRequest": "At your request",
@@ -216,6 +217,33 @@
         "8": "Asks to keep your passport before you have travelled."
       },
       "checklist_note": "These are things to check and ask about. This app cannot tell you whether an agency is honest — only a person can, and the DEMO office is where to ask."
+    },
+    "cost": {
+      "country_label": "Which country are you going to?",
+      "country_placeholder": "Choose a country",
+      "amount_label": "How much are you being asked to pay?",
+      "amount_hint": "The total, including everything the agency has asked for.",
+      "salary_label": "What monthly salary were you promised, in taka?",
+      "salary_hint": "Optional. Used to show how many months of pay the extra amount is worth.",
+      "check_button": "Compare",
+      "empty_title": "Compare what you were asked to pay",
+      "empty_body": "Choose your destination country and enter the amount. This works without internet.",
+      "no_ceiling_title": "No published limit for this country yet",
+      "no_ceiling_body": "We do not have the government's cost figure for this country, so we cannot tell you whether the amount is too high. Ask your District Employment and Manpower Office (DEMO) for the current limit before you pay.",
+      "over_headline": "You are being asked for more than the legal limit",
+      "under_headline": "This is at or below the government limit",
+      "under_body": "The amount you entered is within the published limit. Still get a signed receipt for everything you pay.",
+      "bar_ceiling": "Government limit",
+      "bar_average": "What people usually pay",
+      "bar_yours": "Asked of you",
+      "months_of_salary": "That extra amount is about {{months}} months of your salary",
+      "no_average": "No national average figure is available for this country.",
+      "source_ceiling": "Limit: {{source}} · collected {{date}}",
+      "cta_complaint": "Create a complaint letter",
+      "cta_verify_agency": "Check the agency's licence",
+      "stub_warning": "This app is currently running on placeholder cost figures for testing. Do not rely on these numbers until the official circular is loaded.",
+      "countries_pending": "Only {{count}} destination countries are loaded so far. The full list is added with the official cost circular.",
+      "receipt_note": "Ask for a signed receipt for every taka. Without receipts a complaint is much harder to pursue."
     },
     "severity": {
       "critical": "Very serious",

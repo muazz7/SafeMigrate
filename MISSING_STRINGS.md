@@ -153,3 +153,52 @@ Three need the most care in translation:
   what matters is that the *status* reads active.
 - **`checklist_note`** — the app must never read as though it decides whether an agency
   is honest (§16.8). The wording keeps that judgement with the DEMO office.
+
+---
+
+## Added Day 7 — Cost Checker
+
+26 keys under `cost.*` plus `result.see_cost_breakdown`, all rendering English
+fallbacks.
+
+| Group | Keys |
+|---|---|
+| Form | `country_label` `country_placeholder` `amount_label` `amount_hint` `salary_label` `salary_hint` `check_button` |
+| States | `empty_title` `empty_body` `no_ceiling_title` `no_ceiling_body` `over_headline` `under_headline` `under_body` |
+| Bars & figures | `bar_ceiling` `bar_average` `bar_yours` `months_of_salary` `no_average` |
+| Provenance | `source_ceiling` `stub_warning` `countries_pending` |
+| Actions | `cta_complaint` `cta_verify_agency` `receipt_note` |
+
+**Already in Bangla** (from the spec, interpolated): `result.multiple_of_ceiling` —
+"সরকারি সীমার {{multiple}} গুণ", reused here.
+
+`no_ceiling_body` matters most: it has to say clearly that the app cannot judge the
+amount, without implying the amount is therefore acceptable.
+
+---
+
+## ⚠️ Reference data still owed — blocks correctness, not just translation
+
+### `data/cost-ceilings.json` — 3 rows, needs 12 countries
+
+§10.5 calls for 12 destination countries. The file holds 3 and only Malaysia has a
+ceiling figure. **These have not been invented** (§0 rule 4): fabricated ceilings would
+produce confident, wrong overcharge amounts shown to a worker as fact.
+
+Each row needs: `country_code`, `country_en`, `country_bn`, `ceiling_bdt`,
+`actual_avg_bdt`. A null `ceiling_bdt` is handled safely — the UI declines to judge and
+points the user at the DEMO office — so partial data is fine; wrong data is not.
+
+`actual_avg_bdt` is null for every row today, so the middle "what people usually pay" bar
+never renders. §10.5 asks for three bars; only two appear until that figure is supplied.
+
+### Bangla country names need checking
+
+`মালয়েশিয়া`, `সৌদি আরব`, `সংযুক্ত আরব আমিরাত` in `cost-ceilings.json` were written
+during Day 1 scaffolding rather than supplied by the developer. They should be reviewed
+along with the other nine.
+
+### Also outstanding
+- `data/agencies.json` — 3 placeholder rows; needs the BMET/MoEWOE licence list.
+- `data/min-wages.json` — 3 placeholder rows; drives R04.
+- `samples/` — 8 redacted documents + `NOTES.md`, blocking the Day 3 evaluation.

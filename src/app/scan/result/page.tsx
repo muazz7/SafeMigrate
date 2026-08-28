@@ -80,7 +80,12 @@ function ResultContent() {
         <LowConfidenceNotice />
       ) : null}
 
-      {overcharge ? <OverchargeCard finding={overcharge} /> : null}
+      {overcharge ? (
+        <OverchargeCard
+          finding={overcharge}
+          countryCode={stored.contract.workplace_country_code}
+        />
+      ) : null}
 
       {warnings.length > 0 ? (
         <section className="flex flex-col gap-3">
@@ -146,7 +151,13 @@ function VerdictBanner({ result }: { result: AnalysisResult }) {
  * This is the screenshot that ends up on the slide, so it is given room: the
  * amount large, and two bars making the ratio visible without reading a number.
  */
-function OverchargeCard({ finding }: { finding: Finding }) {
+function OverchargeCard({
+  finding,
+  countryCode,
+}: {
+  finding: Finding;
+  countryCode: string | null;
+}) {
   const computed = finding.computed ?? {};
   const fee = Number(computed.feeBdt ?? 0);
   const ceiling = Number(computed.ceilingBdt ?? 0);
@@ -182,6 +193,16 @@ function OverchargeCard({ finding }: { finding: Finding }) {
           className="bg-critical"
         />
       </dl>
+
+      {/* Deep link into the Cost Checker with the figures already filled in (§14 Day 7). */}
+      {countryCode ? (
+        <Link
+          href={`/cost?country=${encodeURIComponent(countryCode)}&amount=${fee}`}
+          className="btn-secondary focus-ring grid place-items-center mt-1"
+        >
+          {t('result.see_cost_breakdown')}
+        </Link>
+      ) : null}
     </section>
   );
 }
