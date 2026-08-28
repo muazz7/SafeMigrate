@@ -124,3 +124,32 @@ Two need particular care:
 **Already in Bangla** (transcribed from the spec, with values interpolated):
 `result.checked_summary` — "{{checked}}টি বিষয় পরীক্ষা করা হয়েছে, {{skipped}}টি তথ্যের
 অভাবে পরীক্ষা করা যায়নি" · `result.multiple_of_ceiling` — "সরকারি সীমার {{multiple}} গুণ"
+
+---
+
+## Added Day 6 — Agency Verifier
+
+38 keys under `agency.*`, all rendering English fallbacks. Already in Bangla from the
+spec: `agency.stop_before_paying` (টাকা দেওয়ার আগে থামুন) and
+`agency.how_to_spot_heading` (কীভাবে চিনবেন).
+
+| Group | Keys | Notes |
+|---|---|---|
+| Search | `search_label` `search_hint` `search_placeholder` `search_button` | |
+| Empty / counts | `empty_title` `empty_body` `results_one` `results_many` | |
+| Record fields | `rl_number` `valid_until` `district` `baira_member` `baira_not_member` `baira_unknown` | |
+| Four states | `state_active_*` `state_expired_*` `state_suspended_*` `state_cancelled_*` `state_not_found_*` | title + body each |
+| Cautions | `licence_alone_warning` `verify_in_person` `not_found_action` | |
+| Checklist | `legit_heading` `fraud_heading` `legit.1–7` `fraud.1–8` `checklist_note` | 15 list items |
+| Provenance | `source_line` `stub_warning` | |
+
+Three need the most care in translation:
+
+- **`state_not_found_body`** — must say plainly that absence from our copy of the list is
+  not proof the agency is fake, while still being a firm reason to stop and check in
+  person. Too soft and it is useless; too hard and the app is accusing a legitimate
+  agency on incomplete data.
+- **`licence_alone_warning`** — the point is that a number on a signboard proves nothing;
+  what matters is that the *status* reads active.
+- **`checklist_note`** — the app must never read as though it decides whether an agency
+  is honest (§16.8). The wording keeps that judgement with the DEMO office.
